@@ -18,31 +18,16 @@ const FixtureDetail = () => {
 
   const fetchFixtureDetail = async () => {
     try {
-      // const response = await axios.get(`/api/fixtures/${id}`);
-			// Hardcoded fixture for demo purposes
-			const response = {
-					data: {
-							fixture: {
-                  id: 1,
-                  title: 'Fixture 1',
-                  description: 'Description for fixture 1',},
-
-              odds: {
-                  home: 1.5,
-                  draw: 2.5,
-                  away: 3.5,
-              },
-              bonos: 40
-          }
-      };
-
-      setFixture(response.data.fixture);
-      setOdds(response.data.odds);
-      setBonos(response.data.bonos);
+      const response = await axios.get(`/api/fixtures/${id}`);
+      
+      setFixture(response.data);
+      setOdds(response.data.odds);  // Ajusta esto según cómo recibes los datos de odds en tu API.
+      setBonos(response.data.bonusQuantity);  // Ajusta esto según tu estructura de datos en el backend.
     } catch (error) {
       console.error('Error fetching fixture detail:', error);
     }
   };
+  
 
   const handleBuyBonos = async (e) => {
     e.preventDefault();

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 const Fixtures = () => {
   const [fixtures, setFixtures] = useState([]);
+  const [filteredFixtures, setFilteredFixtures] = useState([]); // Fixtures filtrados
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [country, setCountry] = useState('');
@@ -11,57 +12,57 @@ const Fixtures = () => {
   const [date, setDate] = useState('');
 
   useEffect(() => {
-    fetchFixtures(currentPage);
-  }, [currentPage]);
+    fetchFixtures();
+  }, []);
 
-  const fetchFixtures = async (page) => {
+  const fetchFixtures = async () => {
     try {
-      // const response = await axios.get('/api/fixtures', {
-      //   params: {
-      //     page,
-      //     count: 5,
-      //     country,
-      //     homeTeam,
-      //     date,
-      //   },
-      // });
-      // Hardcoded fixtures for demo purposes
-        const response = {
-            fixtures: [
-                {
-                id: 1,
-                title: 'Fixture 1',
-                description: 'Description for fixture 1',
-                },
-                {
-                id: 2,
-                title: 'Fixture 2',
-                description: 'Description for fixture 2',
-                },
-                {
-                id: 3,
-                title: 'Fixture 3',
-                description: 'Description for fixture 3',
-                },
-                {
-                id: 4,
-                title: 'Fixture 4',
-                description: 'Description for fixture 4',
-                },
-                {
-                id: 5,
-                title: 'Fixture 5',
-                description: 'Description for fixture 5',
-                },
-                
-            ],
-            };
+      const response = await axios.get('http://localhost:3000/fixtures', {
+        params: {
+          count: 100, // Aumenta el número para obtener más fixtures de una vez
+        },
+      });
 
-      setFixtures(response.fixtures);
-      setHasMore(response.fixtures.length === 5);
+      if (response.data && Array.isArray(response.data.fixtures)) {
+        setFixtures(response.data.fixtures); // Almacena todos los fixtures
+        setFilteredFixtures(response.data.fixtures); // Inicialmente, muestra todos
+      } else {
+        console.error('Unexpected response format:', response);
+      }
     } catch (error) {
       console.error('Error fetching fixtures:', error);
     }
+  };
+
+  const applyFilters = () => {
+    let filtered = fixtures;
+
+    // Filtra por país (leagueCountry)
+    if (country) {
+      filtered = filtered.filter(fixture => 
+        fixture.leagueCountry.toLowerCase().includes(country.toLowerCase())
+      );
+    }
+
+    // Filtra por equipo local (homeTeam)
+    if (homeTeam) {
+      filtered = filtered.filter(fixture => 
+        fixture.homeTeamName.toLowerCase().includes(homeTeam.toLowerCase())
+      );
+    }
+
+    // Filtra por fecha (fixtureDate)
+    if (date) {
+      filtered = filtered.filter(fixture => {
+        const fixtureDate = new Date(fixture.fixtureDate).toISOString().split('T')[0];
+        return fixtureDate === date;
+      });
+    }
+
+    // Actualiza los fixtures filtrados
+    setFilteredFixtures(filtered);
+    setHasMore(filtered.length > 0);
+    setCurrentPage(1); // Reinicia la paginación
   };
 
   const handlePreviousPage = () => {
@@ -71,16 +72,23 @@ const Fixtures = () => {
   };
 
   const handleNextPage = () => {
-    if (hasMore) {
+    const fixturesPerPage = 5;
+    const maxPage = Math.ceil(filteredFixtures.length / fixturesPerPage);
+    if (currentPage < maxPage) {
       setCurrentPage(currentPage + 1);
     }
   };
 
   const handleFilterChange = (e) => {
     e.preventDefault();
-    setCurrentPage(1);
-    fetchFixtures(1);
+    applyFilters();
   };
+
+  const fixturesPerPage = 5;
+  const displayedFixtures = filteredFixtures.slice(
+    (currentPage - 1) * fixturesPerPage,
+    currentPage * fixturesPerPage
+  );
 
   return (
     <div className="container mx-auto p-4">
@@ -122,10 +130,11 @@ const Fixtures = () => {
         </button>
       </form>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {fixtures.map((fixture) => (
+        {displayedFixtures.map((fixture) => (
           <Link to={`/fixture/${fixture.id}`} key={fixture.id} className="bg-white p-4 rounded shadow hover:bg-gray-100">
-            <h2 className="text-xl font-semibold">{fixture.title}</h2>
-            <p>{fixture.description}</p>
+            <h2 className="text-xl font-semibold">{fixture.homeTeamName} vs {fixture.awayTeamName}</h2>
+            <p>Liga: {fixture.leagueName}</p>
+            <p>Fecha: {new Date(fixture.fixtureDate).toLocaleDateString()}</p>
           </Link>
         ))}
       </div>
@@ -140,7 +149,7 @@ const Fixtures = () => {
         <span>Página {currentPage}</span>
         <button
           onClick={handleNextPage}
-          disabled={!hasMore}
+          disabled={currentPage * fixturesPerPage >= filteredFixtures.length}
           className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
         >
           Siguiente
@@ -149,6 +158,5 @@ const Fixtures = () => {
     </div>
   );
 };
-
 
 export default Fixtures;
