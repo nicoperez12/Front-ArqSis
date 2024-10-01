@@ -13,7 +13,7 @@ const Fixtures = () => {
 
   useEffect(() => {
     fetchFixtures();
-  }, []);
+  }, []); 
 
   const fetchFixtures = async () => {
     try {
@@ -72,7 +72,7 @@ const Fixtures = () => {
   };
 
   const handleNextPage = () => {
-    const fixturesPerPage = 5;
+    const fixturesPerPage = 6;
     const maxPage = Math.ceil(filteredFixtures.length / fixturesPerPage);
     if (currentPage < maxPage) {
       setCurrentPage(currentPage + 1);
@@ -84,7 +84,7 @@ const Fixtures = () => {
     applyFilters();
   };
 
-  const fixturesPerPage = 5;
+  const fixturesPerPage = 6;
   const displayedFixtures = filteredFixtures.slice(
     (currentPage - 1) * fixturesPerPage,
     currentPage * fixturesPerPage
