@@ -10,7 +10,8 @@ const FixtureDetail = () => {
   const [odds, setOdds] = useState(null);
   const [bonusQuantity, setBonusQuantity] = useState(0);
   const [amount, setAmount] = useState('');
-  const { isAuthenticated } = useAuth0();
+  const [selectedOutcome, setSelectedOutcome] = useState('');
+  const { isAuthenticated,  } = useAuth0();
 
   useEffect(() => {
     fetchFixtureDetail();
@@ -35,9 +36,12 @@ const FixtureDetail = () => {
   const handleBuyBonos = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`/api/fixtures/${id}/buy-bonos`, { amount: parseInt(amount) });
+      const response = await axios.post(`/api/fixtures/${id}/buy-bonos`,
+        { amount: parseInt(amount), team: selectedOutcome }
+      );
       setBonusQuantity(response.data.bonusQuantity); // Actualiza los bonos después de la compra
       setAmount('');
+      setSelectedOutcome('');
     } catch (error) {
       console.error('Error buying bonos:', error);
     }
@@ -82,6 +86,20 @@ const FixtureDetail = () => {
           <div className="bg-white p-4 rounded shadow mb-4">
             <h2 className="text-xl font-semibold mb-2">Comprar Bonos</h2>
             <form onSubmit={handleBuyBonos}>
+              <div className="mb-4">
+                <label className="block text-gray-700">Selecciona tu apuesta</label>
+                <select
+                  value={selectedOutcome}
+                  onChange={(e) => setSelectedOutcome(e.target.value)}
+                  className="w-full px-3 py-2 border rounded"
+                  required
+                >
+                  <option value="" disabled>Selecciona una opción</option>
+                  <option value="home">{fixture.homeTeamName}</option>
+                  <option value="draw">Empate</option>
+                  <option value="away">{fixture.awayTeamName}</option>
+                </select>
+              </div>
               <div className="mb-4">
                 <label className="block text-gray-700">Cantidad de Bonos</label>
                 <input
