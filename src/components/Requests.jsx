@@ -1,48 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from './Navbar';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const Requests = () => {
   const [requests, setRequests] = useState([]);
+  const API_URL = import.meta.env.API_URL || 'http://localhost:3000';
+  const { user, isAuthenticated } = useAuth0();
 
   useEffect(() => {
-    fetchRequests();
+    if (isAuthenticated && user) {
+      fetchRequests();
+    }
   }, []);
 
   const fetchRequests = async () => {
     try {
-      // const response = await axios.get('/api/requests');
-      // Hardcoded requests for demo purposes
-      const response = {
-        requests: [
-          {
-            id: 1,
-            title: 'Solicitud 1',
-            odds: 1.5,
-            bonos: 2,
-            ganancia: 3000,
-            status: 'Pendiente',
-          },
-          {
-            id: 2,
-            title: 'Solicitud 2',
-            odds: 2.5,
-            bonos: 3,
-            ganancia: 7500,
-            status: 'Pendiente',
-          },
-          {
-            id: 3,
-            title: 'Solicitud 3',
-            odds: 3.5,
-            bonos: 4,
-            ganancia: 14000,
-            status: 'Aprobada',
-          },
-        ],
-      };
-
-      setRequests(response.requests);
+      console.log('Fetching requests', user.email);
+        const response = await axios.get(`${API_URL}/requests`, {
+          params: {
+            deposit_token: user.sub,
+          }
+        }
+      );
+      console.log(response);
+      setRequests(response.data);
     } catch (error) {
       console.error('Error fetching requests:', error);
     }
@@ -56,11 +38,11 @@ const Requests = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {requests.map((request) => (
             <div key={request.id} className="bg-white p-4 rounded shadow">
-              <h2 className="text-xl font-semibold">{request.title}</h2>
+              <h2 className="text-xl font-semibold">{request.league_name} - {new Date(request.datetime).toLocaleDateString()}</h2>
+              {/* <p>Probabilidades: {request.odds}</p> */}
+              <p>Bonos comprados: {request.quantity}</p>
+              {/* <p>Ganancia: {request.ganancia}</p> */}
               <p>Estado: {request.status}</p>
-              <p>Probabilidades: {request.odds}</p>
-              <p>Bonos: {request.bonos}</p>
-              <p>Ganancia: {request.ganancia}</p>
             </div>
           ))}
         </div>

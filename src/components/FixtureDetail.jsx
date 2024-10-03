@@ -11,7 +11,8 @@ const FixtureDetail = () => {
   const [bonusQuantity, setBonusQuantity] = useState(0);
   const [amount, setAmount] = useState('');
   const [selectedOutcome, setSelectedOutcome] = useState('');
-  const { isAuthenticated,  } = useAuth0();
+  const { isAuthenticated, user  } = useAuth0();
+  const API_URL = import.meta.env.API_URL || "http://localhost:3000";
 
   useEffect(() => {
     fetchFixtureDetail();
@@ -19,11 +20,17 @@ const FixtureDetail = () => {
 
   const fetchFixtureDetail = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/fixtures/${id}`);
+      const response = await axios.get(`${API_URL}/fixtures/${id}`);
 
       if (response.data) {
         setFixture(response.data); // Guarda los detalles del fixture
-        setOdds(response.data.oddsValues); // Guarda los valores de las odds
+        setOdds(
+          {
+            home: response.data.oddsHome,
+            draw: response.data.oddsDraw,
+            away: response.data.oddsAway,
+          }
+        ); // Guarda los valores de las odds
         setBonusQuantity(response.data.bonusQuantity); // Guarda la cantidad de bonos
       } else {
         console.error('Fixture no encontrado');
@@ -36,8 +43,18 @@ const FixtureDetail = () => {
   const handleBuyBonos = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`/api/fixtures/${id}/buy-bonos`,
-        { amount: parseInt(amount), team: selectedOutcome }
+      console.log(fixture);
+      const response = await axios.post(`${API_URL}/requests`,
+        {
+          group_id: "14", 
+          fixture_id: id,
+          league_name: fixture.leagueName,
+          round: fixture.leagueRound,
+          quantity: parseInt(amount), 
+          result: selectedOutcome,
+          deposit_token: user.sub 
+
+        }
       );
       setBonusQuantity(response.data.bonusQuantity); // Actualiza los bonos después de la compra
       setAmount('');
@@ -63,6 +80,8 @@ const FixtureDetail = () => {
           <p><strong>Equipo Local:</strong> {fixture.homeTeamName}</p>
           <p><strong>Equipo Visitante:</strong> {fixture.awayTeamName}</p>
           <p><strong>Liga:</strong> {fixture.leagueName}</p>
+          <p><strong>País:</strong> {fixture.leagueCountry}</p>
+          <p><strong>Fecha:</strong>  {new Date(fixture.fixtureDate).toLocaleDateString()}</p>
         </div>
 
         {/* Detalles de las probabilidades */}
@@ -100,6 +119,7 @@ const FixtureDetail = () => {
                   <option value="away">{fixture.awayTeamName}</option>
                 </select>
               </div>
+
               <div className="mb-4">
                 <label className="block text-gray-700">Cantidad de Bonos</label>
                 <input
@@ -111,6 +131,10 @@ const FixtureDetail = () => {
                   required
                 />
               </div>
+              {amount &&
+                <div className="font-semibold mb-4">
+                <p className="text-gray-700">Costo: {amount ? amount * 1000 : 0} </p>
+              </div>}
               <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
                 Comprar Bonos
               </button>

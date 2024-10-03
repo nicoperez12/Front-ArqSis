@@ -10,6 +10,7 @@ const Fixtures = () => {
   const [country, setCountry] = useState('');
   const [homeTeam, setHomeTeam] = useState('');
   const [date, setDate] = useState('');
+  const API_URL = import.meta.env.API_URL || "http://localhost:3000";
 
   useEffect(() => {
     fetchFixtures();
@@ -17,7 +18,7 @@ const Fixtures = () => {
 
   const fetchFixtures = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/fixtures', {
+      const response = await axios.get(`${API_URL}/fixtures`, {
         params: {
           count: 100, // Aumenta el número para obtener más fixtures de una vez
         },
@@ -134,6 +135,7 @@ const Fixtures = () => {
           <Link to={`/fixture/${fixture.fixtureId}`} key={fixture.fixtureId} className="bg-white p-4 rounded shadow hover:bg-gray-100">
             <h2 className="text-xl font-semibold">{fixture.homeTeamName} vs {fixture.awayTeamName}</h2>
             <p>Liga: {fixture.leagueName}</p>
+            <p>País: {fixture.leagueCountry}</p>
             <p>Fecha: {new Date(fixture.fixtureDate).toLocaleDateString()}</p>
           </Link>
         ))}

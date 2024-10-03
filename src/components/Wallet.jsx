@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from './Navbar';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const Wallet = () => {
   const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState('');
+  const API_URL = import.meta.env.API_URL || 'http://localhost:3000';
+  const { user, isAuthenticated } = useAuth0();
 
   useEffect(() => {
-    fetchBalance();
-  }, []);
+    if (isAuthenticated && user) {
+      fetchBalance(user.sub);
+    }
+  }, [isAuthenticated, user]);
 
-  const fetchBalance = async () => {
+  const fetchBalance = async (user_token) => {
     try {
-      // const response = await axios.get('/api/wallet/balance');
-      const response = {
-        balance: 100,
-      };
-      setBalance(response.balance);
+      const response = await axios.get(`${API_URL}/users/${user_token}`);
+      setBalance(response.data.wallet);
     } catch (error) {
       console.error('Error fetching balance:', error);
     }
@@ -25,8 +27,9 @@ const Wallet = () => {
   const handleAddMoney = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/wallet/add', { amount: parseFloat(amount) });
+      const response = await axios.patch(`${API_URL}/users/${user.sub}`, { amount: parseFloat(amount) });
       setBalance(response.balance);
+      fetchBalance(user.sub);
       setAmount('');
     } catch (error) {
       console.error('Error adding money:', error);
