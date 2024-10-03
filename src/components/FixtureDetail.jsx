@@ -50,6 +50,7 @@ const FixtureDetail = () => {
           fixture_id: id,
           league_name: fixture.leagueName,
           round: fixture.leagueRound,
+          date: fixture.fixtureDate,
           quantity: parseInt(amount), 
           result: selectedOutcome,
           deposit_token: user.sub 
