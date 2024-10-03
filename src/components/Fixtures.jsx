@@ -131,7 +131,7 @@ const Fixtures = () => {
       </form>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {displayedFixtures.map((fixture) => (
-          <Link to={`/fixture/${fixture.id}`} key={fixture.id} className="bg-white p-4 rounded shadow hover:bg-gray-100">
+          <Link to={`/fixture/${fixture.fixtureId}`} key={fixture.fixtureId} className="bg-white p-4 rounded shadow hover:bg-gray-100">
             <h2 className="text-xl font-semibold">{fixture.homeTeamName} vs {fixture.awayTeamName}</h2>
             <p>Liga: {fixture.leagueName}</p>
             <p>Fecha: {new Date(fixture.fixtureDate).toLocaleDateString()}</p>
