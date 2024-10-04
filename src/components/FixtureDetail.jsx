@@ -57,7 +57,8 @@ const FixtureDetail = () => {
 
         }
       );
-      setBonusQuantity(response.data.bonusQuantity); // Actualiza los bonos después de la compra
+      console.log(response);
+      setBonusQuantity(bonusQuantity - response.data.quantity); // Actualiza los bonos después de la compra
       setAmount('');
       setSelectedOutcome('');
     } catch (error) {
