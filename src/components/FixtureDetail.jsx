@@ -12,7 +12,7 @@ const FixtureDetail = () => {
   const [amount, setAmount] = useState('');
   const [selectedOutcome, setSelectedOutcome] = useState('');
   const { isAuthenticated, user  } = useAuth0();
-  const API_URL = import.meta.env.API_URL || "http://localhost:3000";
+  const API_URL = import.meta.env.API_URL || "https://api.grupo14arquisis.me";
 
   useEffect(() => {
     fetchFixtureDetail();
@@ -42,27 +42,31 @@ const FixtureDetail = () => {
 
   const handleBuyBonos = async (e) => {
     e.preventDefault();
-    try {
-      console.log(fixture);
-      const response = await axios.post(`${API_URL}/requests`,
-        {
-          group_id: "14", 
-          fixture_id: id,
-          league_name: fixture.leagueName,
-          round: fixture.leagueRound,
-          date: fixture.fixtureDate,
-          quantity: parseInt(amount), 
-          result: selectedOutcome,
-          deposit_token: user.sub 
+    if (isAuthenticated && user) {
+      try {
+        const tokenParts = user.sub.split('|');
+        const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+        console.log(fixture);
+        const response = await axios.post(`${API_URL}/requests`,
+          {
+            group_id: "14", 
+            fixture_id: id,
+            league_name: fixture.leagueName,
+            round: fixture.leagueRound,
+            date: fixture.fixtureDate,
+            quantity: parseInt(amount), 
+            result: selectedOutcome,
+            deposit_token: token
 
-        }
-      );
-      console.log(response);
-      setBonusQuantity(bonusQuantity - response.data.quantity); // Actualiza los bonos después de la compra
-      setAmount('');
-      setSelectedOutcome('');
-    } catch (error) {
-      console.error('Error buying bonos:', error);
+          }
+        );
+        console.log(response);
+        setBonusQuantity(bonusQuantity - response.data.quantity); // Actualiza los bonos después de la compra
+        setAmount('');
+        setSelectedOutcome('');
+      } catch (error) {
+        console.error('Error buying bonos:', error);
+      }
     }
   };
 

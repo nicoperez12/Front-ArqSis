@@ -6,18 +6,21 @@ import { useAuth0 } from '@auth0/auth0-react';
 const Wallet = () => {
   const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState('');
-  const API_URL = import.meta.env.API_URL || 'http://localhost:3000';
+  const API_URL = import.meta.env.API_URL || 'https://api.grupo14arquisis.me';
   const { user, isAuthenticated } = useAuth0();
+
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      fetchBalance(user.sub);
+      fetchBalance();
     }
   }, [isAuthenticated, user]);
 
-  const fetchBalance = async (user_token) => {
+  const fetchBalance = async () => {
     try {
-      const response = await axios.get(`${API_URL}/users/${user_token}`);
+      const tokenParts = user.sub.split('|');
+      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const response = await axios.get(`${API_URL}/users/${token}`);
       setBalance(response.data.wallet);
     } catch (error) {
       console.error('Error fetching balance:', error);
@@ -27,9 +30,11 @@ const Wallet = () => {
   const handleAddMoney = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.patch(`${API_URL}/users/${user.sub}`, { amount: parseFloat(amount) });
+      const tokenParts = user.sub.split('|');
+      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const response = await axios.patch(`${API_URL}/users/${token}`, { amount: parseFloat(amount) });
       setBalance(response.balance);
-      fetchBalance(user.sub);
+      fetchBalance();
       setAmount('');
     } catch (error) {
       console.error('Error adding money:', error);

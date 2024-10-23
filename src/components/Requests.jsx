@@ -5,7 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 const Requests = () => {
   const [requests, setRequests] = useState([]);
-  const API_URL = import.meta.env.API_URL || 'http://localhost:3000';
+  const API_URL = import.meta.env.API_URL || 'https://api.grupo14arquisis.me';
   const { user, isAuthenticated } = useAuth0();
 
   useEffect(() => {
@@ -17,9 +17,11 @@ const Requests = () => {
   const fetchRequests = async () => {
     try {
       console.log('Fetching requests', user.email);
+      const tokenParts = user.sub.split('|');
+      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
         const response = await axios.get(`${API_URL}/requests`, {
           params: {
-            deposit_token: user.sub,
+            deposit_token: token,
           }
         }
       );
