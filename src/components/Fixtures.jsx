@@ -10,7 +10,7 @@ const Fixtures = () => {
   const [country, setCountry] = useState('');
   const [homeTeam, setHomeTeam] = useState('');
   const [date, setDate] = useState('');
-  const API_URL = import.meta.env.API_URL || "https://api.grupo14arquisis.me";
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     fetchFixtures();

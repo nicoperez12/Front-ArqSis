@@ -12,7 +12,7 @@ const FixtureDetail = () => {
   const [amount, setAmount] = useState('');
   const [selectedOutcome, setSelectedOutcome] = useState('');
   const { isAuthenticated, user  } = useAuth0();
-  const API_URL = import.meta.env.API_URL || "https://api.grupo14arquisis.me";
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     fetchFixtureDetail();

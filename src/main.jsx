@@ -6,10 +6,11 @@ import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 import Routing from './Routing.jsx';
 import axios from 'axios';
 
-const DOMAIN = import.meta.env.DOMAIN_AUTH0 || "dev-ldmj4nnfbyehlbs5.us.auth0.com";
-const CLIENT_ID = import.meta.env.CLIENT_ID_AUTH0 || "LsRzuUa5Ufvms0zj0LlzAPwvuBAQMBgz";
-const REDIRECT_URI = import.meta.env.REDIRECT_URI || "https://web.grupo14arquisis.me";
-const API_URL = import.meta.env.API_URL || "https://api.grupo14arquisis.me";
+const DOMAIN = import.meta.env.VITE_DOMAIN_AUTH0 || "dev-ldmj4nnfbyehlbs5.us.auth0.com";
+const CLIENT_ID = import.meta.env.VITE_CLIENT_ID_AUTH0 || "LsRzuUa5Ufvms0zj0LlzAPwvuBAQMBgz";
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
+const API_URL = import.meta.env.VITE_API_URL;
+
 
 const AuthWrapper = ({ children }) => {
   const { user, isAuthenticated } = useAuth0();
@@ -18,6 +19,7 @@ const AuthWrapper = ({ children }) => {
     console.log('isAuthenticated:', isAuthenticated);
     const createUser = async () => {
       if (isAuthenticated && user) {
+        try {
         const tokenParts = user.sub.split('|');
         const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
         console.log('Token:', token);
@@ -25,11 +27,14 @@ const AuthWrapper = ({ children }) => {
         // Verifica si el usuario ya existe en la base de datos
         const response = await axios.get(`${API_URL}/users/${token}`);
         console.log('User found:', response.data);
-                  
+        } catch (error) {
+        console.log('Error fetching user:', error.response.data.error);                 
       
         // Si el usuario no existe, crea un nuevo registro
-        if (response.data.error == "User not found") {
+        if (error.response.data.error == "User not found") {
           // Si el error es un 404, el usuario no existe, así que lo creamos
+          const tokenParts = user.sub.split('|');
+          const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
           console.log('User not found, creating user:', user);
           await axios.post(`${API_URL}/users`, {
             username: user.email,
@@ -39,7 +44,7 @@ const AuthWrapper = ({ children }) => {
             wallet: 0,
             requests: {},
           });
-
+        }
       }
     };
   }

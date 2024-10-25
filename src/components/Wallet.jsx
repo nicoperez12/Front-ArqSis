@@ -6,7 +6,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 const Wallet = () => {
   const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState('');
-  const API_URL = import.meta.env.API_URL || 'https://api.grupo14arquisis.me';
+  const API_URL = import.meta.env.VITE_API_URL;
   const { user, isAuthenticated } = useAuth0();
 
 

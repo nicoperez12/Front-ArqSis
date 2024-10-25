@@ -5,7 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 const Requests = () => {
   const [requests, setRequests] = useState([]);
-  const API_URL = import.meta.env.API_URL || 'https://api.grupo14arquisis.me';
+  const API_URL = import.meta.env.VITE_API_URL ;
   const { user, isAuthenticated } = useAuth0();
 
   useEffect(() => {
