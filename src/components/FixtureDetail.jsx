@@ -73,11 +73,24 @@ const FixtureDetail = () => {
 
   const handleRedirect = (e) => {
     e.preventDefault();
+    const tokenParts = user.sub.split('|');
+    const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+
+    const requestData = {
+      group_id: "14",
+      fixture_id: id, // Asegúrate de que `id` está definido
+      league_name: fixture.leagueName,
+      round: fixture.leagueRound,
+      date: fixture.fixtureDate,
+      quantity: parseInt(amount),
+      result: selectedOutcome,
+      user_token: token, // Asegúrate de que `token` está definido
+    };
     
     // Lógica para asegurarte de que el usuario está autenticado
     if (isAuthenticated && user) {
       // Redirige a la ruta de selección de método de pago
-      navigate(`/choose-payment/${id}`);
+      navigate('/choose-payment', { state: requestData });
     } else {
       // Manejo si el usuario no está autenticado (opcional)
       console.error('Usuario no autenticado');
