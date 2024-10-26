@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate  } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './Navbar';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -8,6 +8,7 @@ const FixtureDetail = () => {
   const { id } = useParams();
   const [fixture, setFixture] = useState(null);
   const [odds, setOdds] = useState(null);
+  const navigate = useNavigate();
   const [bonusQuantity, setBonusQuantity] = useState(0);
   const [amount, setAmount] = useState('');
   const [selectedOutcome, setSelectedOutcome] = useState('');
@@ -40,33 +41,46 @@ const FixtureDetail = () => {
     }
   };
 
-  const handleBuyBonos = async (e) => {
-    e.preventDefault();
-    if (isAuthenticated && user) {
-      try {
-        const tokenParts = user.sub.split('|');
-        const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
-        console.log(fixture);
-        const response = await axios.post(`${API_URL}/requests`,
-          {
-            group_id: "14", 
-            fixture_id: id,
-            league_name: fixture.leagueName,
-            round: fixture.leagueRound,
-            date: fixture.fixtureDate,
-            quantity: parseInt(amount), 
-            result: selectedOutcome,
-            deposit_token: token
+  //const handleBuyBonos = async (e) => {
+  //  e.preventDefault();
+  //  if (isAuthenticated && user) {
+  //    try {
+  //      const tokenParts = user.sub.split('|');
+  //      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+  //      console.log(fixture);
+  //      const response = await axios.post(`${API_URL}/requests`,
+  //        {
+  //          group_id: "14", 
+  //          fixture_id: id,
+  //          league_name: fixture.leagueName,
+  //          round: fixture.leagueRound,
+  //          date: fixture.fixtureDate,
+  //          quantity: parseInt(amount), 
+  //          result: selectedOutcome,
+  //          deposit_token: token
+//
+  //        }
+  //      );
+  //      console.log(response);
+  //      setBonusQuantity(bonusQuantity - response.data.quantity); // Actualiza los bonos después de la compra
+  //      setAmount('');
+  //      setSelectedOutcome('');
+  //    } catch (error) {
+  //      console.error('Error buying bonos:', error);
+  //    }
+  //  }
+  //};
 
-          }
-        );
-        console.log(response);
-        setBonusQuantity(bonusQuantity - response.data.quantity); // Actualiza los bonos después de la compra
-        setAmount('');
-        setSelectedOutcome('');
-      } catch (error) {
-        console.error('Error buying bonos:', error);
-      }
+  const handleRedirect = (e) => {
+    e.preventDefault();
+    
+    // Lógica para asegurarte de que el usuario está autenticado
+    if (isAuthenticated && user) {
+      // Redirige a la ruta de selección de método de pago
+      navigate(`/choose-payment/${id}`);
+    } else {
+      // Manejo si el usuario no está autenticado (opcional)
+      console.error('Usuario no autenticado');
     }
   };
 
@@ -110,7 +124,7 @@ const FixtureDetail = () => {
         {isAuthenticated && (
           <div className="bg-white p-4 rounded shadow mb-4">
             <h2 className="text-xl font-semibold mb-2">Comprar Bonos</h2>
-            <form onSubmit={handleBuyBonos}>
+            <form onSubmit={handleRedirect}>
               <div className="mb-4">
                 <label className="block text-gray-700">Selecciona tu apuesta</label>
                 <select
