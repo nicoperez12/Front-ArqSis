@@ -21,7 +21,7 @@ const Requests = () => {
       const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
         const response = await axios.get(`${API_URL}/requests`, {
           params: {
-            deposit_token: token,
+            user_token: token,
           }
         }
       );
