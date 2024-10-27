@@ -13,7 +13,7 @@ function CompletedPurchase() {
     if (token) {
       const confirmTransaction = async () => {
         try {
-          const response = await axios.post("http://localhost:3000/transaction/commit", {
+          const response = await axios.post("http://localhost:3000/transactions/commit", {
             ws_token: token,
           });
           setData(response.data); // Guardamos la respuesta del servidor
