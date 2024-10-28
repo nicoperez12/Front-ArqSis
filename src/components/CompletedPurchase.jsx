@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import axios from "axios";
+import { useLocation } from 'react-router-dom';
 
 function CompletedPurchase() {
   const [searchParams] = useSearchParams();
@@ -8,13 +9,22 @@ function CompletedPurchase() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const request_id = localStorage.getItem('request_id') || '';
+  console.log('Request ID retrieved from localStorage:', request_id);
+
+  
+  
+
   useEffect(() => {
     const token = searchParams.get('token_ws') || '';
+    const request_i = searchParams.get('request_i') || '';
+    console.log(request_i, 'hii')
     if (token) {
       const confirmTransaction = async () => {
         try {
           const response = await axios.post("http://localhost:3000/transactions/commit", {
             ws_token: token,
+            request_id
           });
           setData(response.data); // Guardamos la respuesta del servidor
         } catch (error) {
