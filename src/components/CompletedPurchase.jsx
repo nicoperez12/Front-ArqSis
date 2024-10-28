@@ -11,6 +11,10 @@ function CompletedPurchase() {
 
   const request_id = localStorage.getItem('request_id') || '';
   console.log('Request ID retrieved from localStorage:', request_id);
+  const mail = localStorage.getItem('mail') || '';
+  console.log('Mail retrieved from localStorage:', mail);
+
+
 
   
   
@@ -24,7 +28,8 @@ function CompletedPurchase() {
         try {
           const response = await axios.post("http://localhost:3000/transactions/commit", {
             ws_token: token,
-            request_id
+            request_id,
+            mail
           });
           setData(response.data); // Guardamos la respuesta del servidor
         } catch (error) {

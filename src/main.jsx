@@ -27,6 +27,10 @@ const AuthWrapper = ({ children }) => {
         // Verifica si el usuario ya existe en la base de datos
         const response = await axios.get(`${API_URL}/users/${token}`);
         console.log('User found:', response.data);
+        const mail = response.data.email
+        localStorage.setItem('mail', mail)
+        console.log('Request ID stored in localStorage:', localStorage.getItem('mail'));
+
         } catch (error) {
         console.log('Error fetching user:', error.response.data.error);                 
       
