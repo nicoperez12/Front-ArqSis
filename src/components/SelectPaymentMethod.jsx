@@ -44,6 +44,8 @@ const SelectPaymentMethod = () => {
     e.preventDefault(); // Previene el comportamiento por defecto del formulario
     setError(null); // Reinicia el estado de error
 
+    console.log('en handle web pay')
+
     try {
       // Primera llamada para crear la solicitud y obtener el request_id
       const requestResponse = await axios.post(`${API_URL}/requests`, {
@@ -58,7 +60,7 @@ const SelectPaymentMethod = () => {
         wallet: false,
       });
 
-      console.log(requestResponse.data)
+      console.log('current request', requestResponse.data)
 
       
 
@@ -75,6 +77,7 @@ const SelectPaymentMethod = () => {
         request_id: request_id,
         quantity: quantity
       });
+      console.log("hi",request_id)
 
       // Suponiendo que la respuesta contiene los datos necesarios para la confirmación
       const { token, url, title, type, amount: transactionAmount } = transactionResponse.data;
@@ -93,6 +96,7 @@ const SelectPaymentMethod = () => {
             type,
             amount: quantity* 1000,
           },
+          request_id,
         },
       });
     }
