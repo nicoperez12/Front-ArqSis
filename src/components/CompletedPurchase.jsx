@@ -7,13 +7,14 @@ function CompletedPurchase() {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const API_URL = import.meta.env.VITE_API_URL; 
 
   useEffect(() => {
     const token = searchParams.get('token_ws') || '';
     if (token) {
       const confirmTransaction = async () => {
         try {
-          const response = await axios.post("http://localhost:3000/transactions/commit", {
+          const response = await axios.post(`${API_URL}/transactions/commit`, {
             ws_token: token,
           });
           setData(response.data); // Guardamos la respuesta del servidor

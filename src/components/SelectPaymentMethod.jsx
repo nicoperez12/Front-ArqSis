@@ -28,7 +28,7 @@ const SelectPaymentMethod = () => {
           quantity: quantity, 
           result: result,
           user_token: user_token,
-          deposit_token: user_token
+          wallet: true
         }
       );
       console.log(response);
