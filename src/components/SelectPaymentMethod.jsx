@@ -30,6 +30,7 @@ const SelectPaymentMethod = () => {
           user_token: user_token,
           deposit_token: "",
           wallet: true,
+
         }
       );
       console.log(response);

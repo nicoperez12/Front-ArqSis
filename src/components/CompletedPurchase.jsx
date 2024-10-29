@@ -8,6 +8,7 @@ function CompletedPurchase() {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const API_URL = import.meta.env.VITE_API_URL; 
 
   const request_id = localStorage.getItem('request_id') || '';
   console.log('Request ID retrieved from localStorage:', request_id);
@@ -26,7 +27,7 @@ function CompletedPurchase() {
     if (token) {
       const confirmTransaction = async () => {
         try {
-          const response = await axios.post("http://localhost:3000/transactions/commit", {
+          const response = await axios.post(`${API_URL}/transactions/commit`, {
             ws_token: token,
             request_id,
             mail
