@@ -68,11 +68,11 @@ const Recommendation = () => {
         <h1 className="text-2xl font-bold mb-4">Recomendaciones</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {recommendations.map((recommendation) => (
-            <Link to={`/fixture/${recommendation.id}`} key={recommendation.id} className="bg-white p-4 rounded shadow">
-              <h2 className="text-xl font-semibold">{recommendation.homeTeamName} vs {recommendation.awayTeamName}</h2>
-              <p>Liga: {recommendation.leagueName}</p>
-              <p>País: {recommendation.leagueCountry}</p>
-              <p>Fecha: {new Date(recommendation.fixtureDate).toLocaleDateString()}</p>
+            <Link to={`/fixture/${recommendation.fixture.fixtureId}`} key={recommendation.fixture.fixtureId} className="bg-white p-4 rounded shadow">
+              <h2 className="text-xl font-semibold">{recommendation.fixture.homeTeamName} vs {recommendation.fixture.awayTeamName}</h2>
+              <p>Liga: {recommendation.fixture.leagueName}</p>
+              <p>País: {recommendation.fixture.leagueCountry}</p>
+              <p>Fecha: {new Date(recommendation.fixture.fixtureDate).toLocaleDateString()}</p>
             </Link>
           ))}
         </div>
