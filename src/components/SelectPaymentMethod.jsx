@@ -81,9 +81,9 @@ const SelectPaymentMethod = () => {
       // Suponiendo que la respuesta contiene los datos necesarios para la confirmación
       const { token, url, title, type, amount: transactionAmount } = transactionResponse.data;
 
-      const updateResponseRequest = await axios.patch(`${API_URL}/requests/${request_id}`, {
-        deposit_token: token, // Asume que `token` es el nuevo deposit_token
-      });
+      // const updateResponseRequest = await axios.patch(`${API_URL}/requests/${request_id}`, {
+      //   deposit_token: token, // Asume que `token` es el nuevo deposit_token
+      // });
 
       // Navega al componente de confirmación con los datos necesarios
       navigate('/confirm-webpay-purchase', {

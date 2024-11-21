@@ -31,11 +31,13 @@ const AuthWrapper = ({ children }) => {
         localStorage.setItem('mail', mail)
         console.log('Request ID stored in localStorage:', localStorage.getItem('mail'));
 
-        } catch (error) {
-        console.log('Error fetching user:', error.response.data.error);                 
+        
+        console.log('Error fetching user:', response.data);
+        } catch (error) {                 
       
         // Si el usuario no existe, crea un nuevo registro
         if (error.response.data.error == "User not found") {
+        //if (response.data.error == "User not found") {
           // Si el error es un 404, el usuario no existe, así que lo creamos
           const tokenParts = user.sub.split('|');
           const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
@@ -47,9 +49,11 @@ const AuthWrapper = ({ children }) => {
             name: user.name,
             wallet: 0,
             requests: {},
+            admin: false,
           });
         }
       }
+      
     };
   }
 
