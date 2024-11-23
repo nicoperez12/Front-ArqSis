@@ -8,6 +8,8 @@ import SelectPaymentMethod from './components/SelectPaymentMethod';
 import ConfirmPurchase from './components/ConfirmPurchase';
 import CompletedPurchase from './components/CompletedPurchase';
 import Recommendation from './components/Recommendation';
+import Admin from './components/Admin';
+import Auctions from './components/Auctions';
 
 function Routing() {
   return (
@@ -20,6 +22,8 @@ function Routing() {
       <Route path="/confirm-webpay-purchase" element={<ConfirmPurchase />} />
       <Route path="/completed-purchase" element={<CompletedPurchase />} />
       <Route path="/recommendations" element={<Recommendation />} />
+      <Route path="/admin" element={<Admin />} />
+      <Route path="/auctions" element={<Auctions />} />
     </Routes>
   );
 }
