@@ -5,28 +5,29 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 const Admin = () => {
   const [admin, setAdmin] = useState(false);
-  const API_URL = import.meta.env.VITE_API_URL ;
-  const { user, isAuthenticated } = useAuth0();
+  const API_URL = import.meta.env.VITE_API_URL;
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
     if (isAuthenticated && user) {
       fetchAdmin();
     }
-  }, []);
+  }, [isAuthenticated, user]);
 
   const fetchAdmin = async () => {
     try {
       console.log('Fetching admin', user.email);
-      const tokenParts = user.sub.split('|');
-      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const token = await getAccessTokenSilently();
       const response = await axios.get(`${API_URL}/users`, {
-          params: {
-            user_token: token,
-          }
-        }
-      );
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          user_token: user.sub,
+        },
+      });
       console.log(response);
-      setRequests(response.data);
+      setAdmin(response.data.admin);
     } catch (error) {
       console.error('Error fetching admin:', error);
     }

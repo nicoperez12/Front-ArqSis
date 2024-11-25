@@ -5,26 +5,28 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 const Requests = () => {
   const [requests, setRequests] = useState([]);
-  const API_URL = import.meta.env.VITE_API_URL ;
-  const { user, isAuthenticated } = useAuth0();
+  const API_URL = import.meta.env.VITE_API_URL;
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
     if (isAuthenticated && user) {
       fetchRequests();
     }
-  }, []);
+  }, [isAuthenticated, user]);
 
   const fetchRequests = async () => {
     try {
       console.log('Fetching requests', user.email);
-      const tokenParts = user.sub.split('|');
-      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
-        const response = await axios.get(`${API_URL}/requests`, {
-          params: {
-            user_token: token,
-          }
-        }
-      );
+      const token = await getAccessTokenSilently();
+      console.log("---", token);
+      const response = await axios.get(`${API_URL}/requests/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          user_token: user.sub,
+        },
+      });
       console.log(response);
       setRequests(response.data);
     } catch (error) {

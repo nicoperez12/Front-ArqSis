@@ -13,15 +13,14 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 
 const AuthWrapper = ({ children }) => {
-  const { user, isAuthenticated } = useAuth0();
+  const { user, isAuthenticated, getAccessTokenSilently} = useAuth0();
 
   useEffect(() => {
     console.log('isAuthenticated:', isAuthenticated);
     const createUser = async () => {
       if (isAuthenticated && user) {
         try {
-        const tokenParts = user.sub.split('|');
-        const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+        const token = await getAccessTokenSilently();
         console.log('Token:', token);
         
         // Verifica si el usuario ya existe en la base de datos
@@ -39,8 +38,7 @@ const AuthWrapper = ({ children }) => {
         if (error.response.data.error == "User not found") {
         //if (response.data.error == "User not found") {
           // Si el error es un 404, el usuario no existe, así que lo creamos
-          const tokenParts = user.sub.split('|');
-          const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+          const token = await getAccessTokenSilently();
           console.log('User not found, creating user:', user);
           await axios.post(`${API_URL}/users`, {
             username: user.email,
@@ -58,7 +56,7 @@ const AuthWrapper = ({ children }) => {
   }
 
   createUser();
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, getAccessTokenSilently]);
 
   return children;
 };
