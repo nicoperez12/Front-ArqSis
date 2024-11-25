@@ -25,6 +25,7 @@ const Recommendation = () => {
       const response = await axios.get(`${API_URL}/recommendations`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
         params: {
           user_token: user.sub,
@@ -39,7 +40,15 @@ const Recommendation = () => {
 
   const fetchWorkersActive = async () => {
     try {
-      const response = await axios.get(`${API_URL}/recommendations/heartbeat`);
+      const token = await getAccessTokenSilently();
+      const response = await axios.get(`${API_URL}/recommendations/heartbeat`,
+        {
+          headers: {
+            Authorization:  `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
       console.log(response);
       if (response.data) {
         setWorkersActive(response.data);

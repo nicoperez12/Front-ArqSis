@@ -21,7 +21,15 @@ const FixtureDetail = () => {
 
   const fetchFixtureDetail = async () => {
     try {
-      const response = await axios.get(`${API_URL}/fixtures/${id}`);
+      const token = await getAccessTokenSilently();
+      const response = await axios.get(`${API_URL}/fixtures/${id}`, { id} ,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
       if (response.data) {
         setFixture(response.data);
         setOdds({

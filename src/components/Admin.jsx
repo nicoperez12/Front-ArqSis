@@ -18,15 +18,17 @@ const Admin = () => {
     try {
       console.log('Fetching admin', user.email);
       const token = await getAccessTokenSilently();
+      console.log("el token es", token);
       const response = await axios.get(`${API_URL}/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
         params: {
           user_token: user.sub,
         },
       });
-      console.log(response);
+      console.log("la response es",response);
       setAdmin(response.data.admin);
     } catch (error) {
       console.error('Error fetching admin:', error);
