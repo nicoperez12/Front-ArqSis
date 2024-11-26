@@ -41,3 +41,4 @@ const CreateExchange = (request, fixture) => {
   );
 
 }
+export default CreateExchange;
