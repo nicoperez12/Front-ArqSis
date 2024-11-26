@@ -25,7 +25,7 @@ const Recommendation = () => {
       const response = await axios.get(`${API_URL}/recommendations`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          // 'Content-Type': 'application/json',
         },
         params: {
           user_token: user.sub,
@@ -45,7 +45,7 @@ const Recommendation = () => {
         {
           headers: {
             Authorization:  `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            // 'Content-Type': 'application/json',
           }
         }
       );

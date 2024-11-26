@@ -22,6 +22,7 @@ const Wallet = () => {
       const response = await axios.get(`${API_URL}/users/${user.sub}`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          // 'Content-Type': 'application/json',
         },
       });
       setBalance(response.data.wallet);

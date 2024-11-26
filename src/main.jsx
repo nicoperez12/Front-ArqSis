@@ -1,4 +1,4 @@
-import { StrictMode, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom';
 import './index.css'
@@ -18,15 +18,15 @@ const AuthWrapper = ({ children }) => {
     console.log('isAuthenticated:', isAuthenticated);
     const createUser = async () => {
       if (isAuthenticated && user) {
+        let token;
         try {
-          const token = await getAccessTokenSilently();
+          token = await getAccessTokenSilently();
           console.log('Token:', token);
-          
           // Verifica si el usuario ya existe en la base de datos
-          const response = await axios.get(`${API_URL}/users/${user.sub}`, { //
+          const response = await axios.get(`${API_URL}/users/${user.sub}`, {
             headers: {
               Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
+              // 'Content-Type': 'application/json',
             },
           });
           console.log('User found:', response.data);
@@ -36,9 +36,8 @@ const AuthWrapper = ({ children }) => {
         } catch (error) {
           console.error('Error fetching user:', error);
           // Si el usuario no existe, crea un nuevo registro
-          if (error.response && error.response.data.error === "User not found") {
+          if (error.response && error.response.status === 404) {
             try {
-              const token = await getAccessTokenSilently();
               console.log('User not found, creating user:', user);
               await axios.post(`${API_URL}/users`, {
                 username: user.email,
@@ -48,6 +47,11 @@ const AuthWrapper = ({ children }) => {
                 wallet: 0,
                 requests: {},
                 admin: false,
+              }, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  // 'Content-Type': 'application/json',
+                },
               });
             } catch (createError) {
               console.error('Error creating user:', createError);
@@ -72,7 +76,8 @@ createRoot(document.getElementById('root')).render(
       domain={DOMAIN}
       clientId={CLIENT_ID}
       authorizationParams={{
-        redirect_uri: REDIRECT_URI
+        redirect_uri: REDIRECT_URI,
+        audience: `https://${DOMAIN}/api/v2/`,
       }}
       onRedirectCallback={onRedirectCallback}
   >
