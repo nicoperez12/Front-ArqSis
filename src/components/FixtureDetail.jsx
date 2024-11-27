@@ -22,12 +22,16 @@ const FixtureDetail = () => {
   const fetchFixtureDetail = async () => {
     try {
       const token = await getAccessTokenSilently();
-      const response = await axios.get(`${API_URL}/fixtures/${id}`, { id} ,
+      const response = await axios.get(`${API_URL}/fixtures/${id}` ,
         {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
+          params: {
+            id,
+            user_token: user.sub,
+          }
         },
       );
       if (response.data) {
@@ -57,7 +61,7 @@ const FixtureDetail = () => {
       date: fixture.fixtureDate,
       quantity: parseInt(amount),
       result: selectedOutcome,
-      user_token: token,
+      user_token: user.sub,
     };
     
     if (isAuthenticated && user) {

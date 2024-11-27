@@ -11,7 +11,7 @@ const Fixtures = () => {
   const [country, setCountry] = useState('');
   const [homeTeam, setHomeTeam] = useState('');
   const [date, setDate] = useState('');
-  const { getAccessTokenSilently } = useAuth0();
+  const { user, getAccessTokenSilently } = useAuth0();
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const Fixtures = () => {
         },
         params: {
           count: 100, // Aumenta el número para obtener más fixtures de una vez
-          // uer_token:token,
+          uer_token: user.sub,
         },
       });
       console.log("Response es", response);

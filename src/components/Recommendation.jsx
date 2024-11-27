@@ -46,6 +46,9 @@ const Recommendation = () => {
           headers: {
             Authorization:  `Bearer ${token}`,
             // 'Content-Type': 'application/json',
+          },
+          params: {
+            user_token: user.sub,
           }
         }
       );

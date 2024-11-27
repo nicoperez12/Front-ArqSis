@@ -13,7 +13,7 @@ const Admin = () => {
       fetchAdmin();
     }
   }, [isAuthenticated, user]);
-
+  console.log("es admin", admin);
   const fetchAdmin = async () => {
     try {
       console.log('Fetching admin', user.email);

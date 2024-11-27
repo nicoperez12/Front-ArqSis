@@ -9,22 +9,25 @@ const Wallet = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
-
+  
   useEffect(() => {
     if (isAuthenticated && user) {
       fetchBalance();
     }
   }, [isAuthenticated, user]);
-
+  // console.log(user);
   const fetchBalance = async () => {
     try {
       const token = await getAccessTokenSilently();
+      console.log(token);
+      console.log(user.sub);
       const response = await axios.get(`${API_URL}/users/${user.sub}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          // 'Content-Type': 'application/json',
-        },
+          'Content-Type': 'application/json',
+        }
       });
+      console.log(response)
       setBalance(response.data.wallet);
     } catch (error) {
       console.error('Error fetching balance:', error);
@@ -39,6 +42,9 @@ const Wallet = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        params: {
+          user_token: user.sub,
+        }
       });
       setBalance(response.data.wallet);
       fetchBalance();

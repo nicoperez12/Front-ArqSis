@@ -5,11 +5,11 @@ import { useAuth0 } from '@auth0/auth0-react';
 const API_URL = import.meta.env.VITE_API_URL;
 
 const SelectPaymentMethod = () => {
-  const { getAccessTokenSilently } = useAuth0();
+  const { user, getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
   const location = useLocation(); 
   const [error, setError] = useState(null);
-  const { group_id, fixture_id, league_name, round, date, quantity, result, user_token } = location.state || {};
+  const { group_id, fixture_id, league_name, round, date, quantity, result } = location.state || {};
 
   console.log("la quantity es", quantity);
 
@@ -25,7 +25,7 @@ const SelectPaymentMethod = () => {
         date,
         quantity,
         result,
-        user_token: user_token || token,
+        user_token: user.sub,
         deposit_token: "",
         wallet: true,
       }, {
