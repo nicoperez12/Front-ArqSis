@@ -21,19 +21,8 @@ const FixtureDetail = () => {
 
   const fetchFixtureDetail = async () => {
     try {
-      const token = await getAccessTokenSilently();
-      const response = await axios.get(`${API_URL}/fixtures/${id}` ,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          params: {
-            id,
-            user_token: user.sub,
-          }
-        },
-      );
+      // const token = await getAccessTokenSilently();
+      const response = await axios.get(`${API_URL}/fixtures/${id}`);
       if (response.data) {
         setFixture(response.data);
         setOdds({
@@ -52,7 +41,7 @@ const FixtureDetail = () => {
 
   const handleRedirect = async (e) => {
     e.preventDefault();
-    const token = await getAccessTokenSilently();
+    // const token = await getAccessTokenSilently();
     const requestData = {
       group_id: "14",
       fixture_id: id,

@@ -10,7 +10,7 @@ const Admin = () => {
   const [fixtures, setFixtures] = useState([]);
   const [selectedFixture, setSelectedFixture] = useState(null);
   const API_URL = import.meta.env.VITE_API_URL ;
-  const { user, isAuthenticated } = useAuth0();
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [auctions, setAuctions] = useState([]);
   const [exchanges, setExchanges] = useState([]);
 
@@ -47,10 +47,13 @@ const Admin = () => {
 
   const fetchRequestsAndFixtures = async () => {
     try {
-      const tokenParts = user.sub.split('|');
-      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const token = await getAccessTokenSilently();
       console.log('Fetching requests and fixtures', token);
-      const response = await axios.get(`${API_URL}/requests/fixtures/${token}`,
+      const response = await axios.get(`${API_URL}/requests/fixtures/${token}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
       );
       console.log(response);
       setRequests(response.data.requests);
@@ -63,8 +66,7 @@ const Admin = () => {
 
   const fetchAuctions = async () => {
     try {
-      const tokenParts = user.sub.split('|');
-      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const token = await getAccessTokenSilently();
       console.log('Fetching auctions', token);
       const response = await axios.get(`${API_URL}/auctions/`, {
           headers: {
@@ -82,8 +84,7 @@ const Admin = () => {
 
   const fetchExchanges = async () => {
     try {
-      const tokenParts = user.sub.split('|');
-      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const token = getAccessTokenSilently();
       console.log('Fetching exchanges', token);
       const response = await axios.get(`${API_URL}/proposals/`, {
           headers: {

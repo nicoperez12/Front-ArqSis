@@ -20,7 +20,8 @@ const Fixtures = () => {
 
   const fetchFixtures = async () => {
     try {
-      const token = await getAccessTokenSilently();
+      // const token = await getAccessTokenSilently();
+      const token = 123
       console.log("token fixtures", token);
       const response = await axios.get(`${API_URL}/fixtures`, {
         headers: {
@@ -29,7 +30,7 @@ const Fixtures = () => {
         },
         params: {
           count: 100, // Aumenta el número para obtener más fixtures de una vez
-          uer_token: user.sub,
+          // user_token: user.sub,
         },
       });
       console.log("Response es", response);
