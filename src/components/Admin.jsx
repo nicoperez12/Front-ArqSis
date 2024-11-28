@@ -10,25 +10,29 @@ const Admin = () => {
   const API_URL = import.meta.env.VITE_API_URL ;
   const { user, isAuthenticated } = useAuth0();
 
+
   useEffect(() => {
     if (isAuthenticated && user) {
       fetchAdmin();
       fetchRequestsAndFixtures();
     }
-  }, []);
-
+  }, [isAuthenticated, user]);
+  console.log("es admin", admin);
   const fetchAdmin = async () => {
     try {
       console.log('Fetching admin', user.email);
-      const tokenParts = user.sub.split('|');
-      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const token = await getAccessTokenSilently();
+      console.log("el token es", token);
       const response = await axios.get(`${API_URL}/users`, {
-          params: {
-            user_token: token,
-          }
-        }
-      );
-      console.log(response);
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        params: {
+          user_token: user.sub,
+        },
+      });
+      console.log("la response es",response);
       setAdmin(response.data.admin);
     } catch (error) {
       console.error('Error fetching admin:', error);

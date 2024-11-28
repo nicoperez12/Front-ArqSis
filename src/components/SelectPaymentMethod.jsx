@@ -1,53 +1,51 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { PopupCancelledError } from '@auth0/auth0-react';
+import { useAuth0 } from '@auth0/auth0-react';
 const API_URL = import.meta.env.VITE_API_URL;
 
 const SelectPaymentMethod = () => {
+  const { user, getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
   const location = useLocation(); 
-  const [error, setError] = useState(null)
-  const { group_id, fixture_id, league_name, round, date, quantity, result, user_token } = location.state || {};
+  const [error, setError] = useState(null);
+  const { group_id, fixture_id, league_name, round, date, quantity, result } = location.state || {};
 
-  console.log("la quantity es", quantity) 
-  // Función para manejar la compra con Wallet
+  console.log("la quantity es", quantity);
+
   const handleWalletPurchase = async (e) => {
     e.preventDefault();
-    // Lógica para procesar el pago con Wallet o redirigir
     try {
-      // const tokenParts = user.sub.split('|');
-      // const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
-      const response = await axios.post(`${API_URL}/requests`,
-        {
-          group_id: group_id, 
-          fixture_id: fixture_id,
-          league_name: league_name,
-          round: round,
-          date: date,
-          quantity: quantity, 
-          result: result,
-          user_token: user_token,
-          deposit_token: "",
-          wallet: true,
-
-        }
-      );
+      const token = await getAccessTokenSilently();
+      const response = await axios.post(`${API_URL}/requests`, {
+        group_id,
+        fixture_id,
+        league_name,
+        round,
+        date,
+        quantity,
+        result,
+        user_token: user.sub,
+        deposit_token: "",
+        wallet: true,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log(response);
     } catch (error) {
       console.error('Error fetching fixture detail:', error);
     }
-    
     navigate(`/fixture/${fixture_id}`);
   };
 
-  // Función para manejar la compra con Webpay
   const handleWebpayPurchase = async (e) => {
-    e.preventDefault(); // Previene el comportamiento por defecto del formulario
-    setError(null); // Reinicia el estado de error
+    e.preventDefault();
+    setError(null);
 
     try {
-      // Primera llamada para crear la solicitud y obtener el request_id
+      const token = await getAccessTokenSilently();
       const requestResponse = await axios.post(`${API_URL}/requests`, {
         group_id,
         fixture_id,

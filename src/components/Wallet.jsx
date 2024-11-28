@@ -7,20 +7,27 @@ const Wallet = () => {
   const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState('');
   const API_URL = import.meta.env.VITE_API_URL;
-  const { user, isAuthenticated } = useAuth0();
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
-
+  
   useEffect(() => {
     if (isAuthenticated && user) {
       fetchBalance();
     }
   }, [isAuthenticated, user]);
-
+  // console.log(user);
   const fetchBalance = async () => {
     try {
-      const tokenParts = user.sub.split('|');
-      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
-      const response = await axios.get(`${API_URL}/users/${token}`);
+      const token = await getAccessTokenSilently();
+      console.log(token);
+      console.log(user.sub);
+      const response = await axios.get(`${API_URL}/users/${user.sub}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+      console.log(response)
       setBalance(response.data.wallet);
     } catch (error) {
       console.error('Error fetching balance:', error);
@@ -30,10 +37,16 @@ const Wallet = () => {
   const handleAddMoney = async (e) => {
     e.preventDefault();
     try {
-      const tokenParts = user.sub.split('|');
-      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
-      const response = await axios.patch(`${API_URL}/users/${token}`, { amount: parseFloat(amount) });
-      setBalance(response.balance);
+      const token = await getAccessTokenSilently();
+      const response = await axios.patch(`${API_URL}/users/${user.sub}`, { amount: parseFloat(amount) }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          user_token: user.sub,
+        }
+      });
+      setBalance(response.data.wallet);
       fetchBalance();
       setAmount('');
     } catch (error) {

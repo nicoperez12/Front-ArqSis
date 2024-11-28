@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import { useLocation } from 'react-router-dom';
+import { useAuth0 } from "@auth0/auth0-react";
 
 function CompletedPurchase() {
+  const { getAccessTokenSilently } = useAuth0();
   const [searchParams] = useSearchParams();
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,22 +16,23 @@ function CompletedPurchase() {
   const mail = localStorage.getItem('mail') || '';
   console.log('Mail retrieved from localStorage:', mail);
 
-
-
-  
-  
-
+  const token = getAccessTokenSilently();
   useEffect(() => {
-    const token = searchParams.get('token_ws') || '';
+    const ws_token = searchParams.get('token_ws') || '';
     const request_i = searchParams.get('request_i') || '';
     console.log(request_i, 'hii')
     if (token) {
       const confirmTransaction = async () => {
         try {
           const response = await axios.post(`${API_URL}/transactions/commit`, {
-            ws_token: token,
+            ws_token,
             request_id,
             mail
+        },{
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
           });
           setData(response.data); // Guardamos la respuesta del servidor
         } catch (error) {

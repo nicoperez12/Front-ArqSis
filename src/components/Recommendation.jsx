@@ -6,8 +6,8 @@ import { Link } from 'react-router-dom';
 
 const Recommendation = () => {
   const [recommendations, setRecommendations] = useState([]);
-  const API_URL = import.meta.env.VITE_API_URL ;
-  const { user, isAuthenticated } = useAuth0();
+  const API_URL = import.meta.env.VITE_API_URL;
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [workersActive, setWorkersActive] = useState(false);
 
   useEffect(() => {
@@ -15,45 +15,57 @@ const Recommendation = () => {
       fetchRecommendations();
       fetchWorkersActive();
     }
-  }, []);
+  }, [isAuthenticated, user]);
 
   const fetchRecommendations = async () => {
     try {
       console.log('Fetching recommendations', user.email);
-      const tokenParts = user.sub.split('|');
-      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const token = await getAccessTokenSilently();
+      console.log("el token es", token);
       const response = await axios.get(`${API_URL}/recommendations`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // 'Content-Type': 'application/json',
+        },
         params: {
-          user_token: token,
-        }
-      }
-      );
+          user_token: user.sub,
+        },
+      });
       console.log(response);
       setRecommendations(response.data);
     } catch (error) {
       console.error('Error fetching recommendations:', error);
     }
-  }
+  };
 
   const fetchWorkersActive = async () => {
     try {
-      const response = await axios.get(`${API_URL}/recommendations/heartbeat`);
+      const token = await getAccessTokenSilently();
+      const response = await axios.get(`${API_URL}/recommendations/heartbeat`,
+        {
+          headers: {
+            Authorization:  `Bearer ${token}`,
+            // 'Content-Type': 'application/json',
+          },
+          params: {
+            user_token: user.sub,
+          }
+        }
+      );
       console.log(response);
       if (response.data) {
         setWorkersActive(response.data);
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error fetching workers:', error);
     }
-  }
+  };
 
   return (
     <>
       <Navbar />
       <div className="container mx-auto p-4">
-
-      <h1 className="text-2xl font-bold mb-4">
+        <h1 className="text-2xl font-bold mb-4">
           Estado de los workers:
           <button
             onClick={fetchWorkersActive}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate  } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './Navbar';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -12,7 +12,7 @@ const FixtureDetail = () => {
   const [bonusQuantity, setBonusQuantity] = useState(0);
   const [amount, setAmount] = useState('');
   const [selectedOutcome, setSelectedOutcome] = useState('');
-  const { isAuthenticated, user  } = useAuth0();
+  const { isAuthenticated, user, getAccessTokenSilently } = useAuth0();
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -21,18 +21,27 @@ const FixtureDetail = () => {
 
   const fetchFixtureDetail = async () => {
     try {
-      const response = await axios.get(`${API_URL}/fixtures/${id}`);
-
-      if (response.data) {
-        setFixture(response.data); // Guarda los detalles del fixture
-        setOdds(
-          {
-            home: response.data.oddsHome,
-            draw: response.data.oddsDraw,
-            away: response.data.oddsAway,
+      const token = await getAccessTokenSilently();
+      const response = await axios.get(`${API_URL}/fixtures/${id}` ,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          params: {
+            id,
+            user_token: user.sub,
           }
-        ); // Guarda los valores de las odds
-        setBonusQuantity(response.data.bonusQuantity); // Guarda la cantidad de bonos
+        },
+      );
+      if (response.data) {
+        setFixture(response.data);
+        setOdds({
+          home: response.data.oddsHome,
+          draw: response.data.oddsDraw,
+          away: response.data.oddsAway,
+        });
+        setBonusQuantity(response.data.bonusQuantity);
       } else {
         console.error('Fixture no encontrado');
       }
@@ -41,58 +50,23 @@ const FixtureDetail = () => {
     }
   };
 
-  //const handleBuyBonos = async (e) => {
-  //  e.preventDefault();
-  //  if (isAuthenticated && user) {
-  //    try {
-  //      const tokenParts = user.sub.split('|');
-  //      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
-  //      console.log(fixture);
-  //      const response = await axios.post(`${API_URL}/requests`,
-  //        {
-  //          group_id: "14", 
-  //          fixture_id: id,
-  //          league_name: fixture.leagueName,
-  //          round: fixture.leagueRound,
-  //          date: fixture.fixtureDate,
-  //          quantity: parseInt(amount), 
-  //          result: selectedOutcome,
-  //          deposit_token: token
-//
-  //        }
-  //      );
-  //      console.log(response);
-  //      setBonusQuantity(bonusQuantity - response.data.quantity); // Actualiza los bonos después de la compra
-  //      setAmount('');
-  //      setSelectedOutcome('');
-  //    } catch (error) {
-  //      console.error('Error buying bonos:', error);
-  //    }
-  //  }
-  //};
-
-  const handleRedirect = (e) => {
+  const handleRedirect = async (e) => {
     e.preventDefault();
-    const tokenParts = user.sub.split('|');
-    const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
-
+    const token = await getAccessTokenSilently();
     const requestData = {
       group_id: "14",
-      fixture_id: id, // Asegúrate de que `id` está definido
+      fixture_id: id,
       league_name: fixture.leagueName,
       round: fixture.leagueRound,
       date: fixture.fixtureDate,
       quantity: parseInt(amount),
       result: selectedOutcome,
-      user_token: token, // Asegúrate de que `token` está definido
+      user_token: user.sub,
     };
     
-    // Lógica para asegurarte de que el usuario está autenticado
     if (isAuthenticated && user) {
-      // Redirige a la ruta de selección de método de pago
       navigate('/choose-payment', { state: requestData });
     } else {
-      // Manejo si el usuario no está autenticado (opcional)
       console.error('Usuario no autenticado');
     }
   };
