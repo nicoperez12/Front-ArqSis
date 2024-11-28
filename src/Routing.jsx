@@ -27,9 +27,9 @@ function Routing() {
       <Route path="/recommendations" element={<Recommendation />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/auctions" element={<Auctions />} />
-      <Route path="/bid" element={<Bid />} />
-      <Route path="/create-exchange" element={<CreateExchange />} />
-      <Route path="/create-auction" element={<CreateAuction />} />
+      <Route path="/bid/:id" element={<Bid />} />
+      <Route path="/create-exchange/:id" element={<CreateExchange />} />
+      <Route path="/create-auction/:id" element={<CreateAuction />} />
     </Routes>
   );
 }

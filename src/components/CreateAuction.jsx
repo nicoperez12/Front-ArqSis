@@ -41,3 +41,4 @@ const CreateAuction = (request, fixture) => {
   );
 
 }
+export default CreateAuction;

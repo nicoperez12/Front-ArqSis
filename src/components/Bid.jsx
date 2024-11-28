@@ -41,3 +41,4 @@ const Bid = (request, fixture) => {
   );
 
 }
+export default Bid;
