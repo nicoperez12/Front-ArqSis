@@ -17,13 +17,15 @@ const Auctions = () => {
 
   const fetchAuctions = async () => {
     try {
-      // const token = await getAccessTokenSilently();
-      // const decodedToken = jwt_decode(token);
-      // console.log('Decoded token', decodedToken);
-      console.log('Fetching requests', user.email);
-      // const tokenParts = user.sub.split('|');
-      // const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
-      const response = await axios.get(`${API_URL}/auctions`);
+      const tokenParts = user.sub.split('|');
+      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      console.log('Fetching Auctions');
+      const response = await axios.get(`${API_URL}/auctions/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
       console.log(response);
       setAuctions(response.data);
     } catch (error) {

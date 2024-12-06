@@ -3,12 +3,13 @@ import axios from 'axios';
 import Navbar from './Navbar';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Link } from 'react-router-dom';
+import CreateExchange from './CreateExchange';
 
 const Admin = () => {
   const [admin, setAdmin] = useState(false);
   const [requests, setRequests] = useState([]);
   const [fixtures, setFixtures] = useState([]);
-  const [selectedFixture, setSelectedFixture] = useState(null);
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const API_URL = import.meta.env.VITE_API_URL ;
   const { user, isAuthenticated } = useAuth0();
   const [auctions, setAuctions] = useState([]);
@@ -95,6 +96,43 @@ const Admin = () => {
     }
   }
 
+  const createAuction = async (requestId) => {
+    try {
+      console.log('Creating auction', requestId);
+      const tokenParts = user.sub.split('|');
+      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const response = await axios.post(`${API_URL}/auctions`, {
+          request_id: requestId,
+          user_token: token,
+        }
+      );
+      console.log(response);
+      fetchAuctions();
+    } catch (error) {
+      console.error('Error creating auction:', error);
+    }
+  };
+
+  const createExchange = async (requestId) => {
+    try {
+      console.log('Creating exchange', requestId);
+      const tokenParts = user.sub.split('|');
+      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const response = await axios.post(`${API_URL}/proposals`, {
+          request_id: requestId,
+          user_token: token,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      console.log(response);
+      fetchExchanges();
+    } catch (error) {
+      console.error('Error creating exchange:', error);
+    }
+  }
+
   return (
     <>
       <Navbar />
@@ -103,35 +141,34 @@ const Admin = () => {
           <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Subastar o Intercambiar</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {fixtures.map((fixture) => (
-                <div
-                  key={fixture.fixtureId}
-                  className={`bg-white p-4 rounded shadow hover:bg-gray-100 cursor-pointer ${selectedFixture === fixture.fixtureId ? 'bg-blue-100' : ''}`}
-                  onClick={() => setSelectedFixture(fixture.fixtureId)}
+              {requests.map((request) => (
+                <div 
+                  key={request.id}
+                  className={`bg-white p-4 rounded shadow hover:bg-gray-100 cursor-pointer ${selectedRequest === request.id ? 'bg-blue-100' : ''}`}
+                  onClick={() => setSelectedRequest(request.id)}
                 >
-                  <h2 className="text-xl font-semibold">{fixture.homeTeamName} vs {fixture.awayTeamName}</h2>
-                  <p>Liga: {fixture.leagueName}</p>
-                  <p>País: {fixture.leagueCountry}</p>
-                  <p>Fecha: {new Date(fixture.fixtureDate).toLocaleDateString()}</p>
+                  <h2 className="text-xl font-semibold">{request.league_name} - {request.round}</h2>
+                  <p>Fecha: {new Date(request.datetime).toLocaleDateString()}</p>
+                  <p>Bonos disponibles: {request.quantity}</p>
                 </div>
               ))}
             </div>
           </div>
           <div className="container mx-auto p-4">
-            <Link to={`/create-auction/${selectedFixture}`}>
+            <Link to={`/create-auction/${selectedRequest}`}>
               <button
-                className={`px-4 py-2 rounded ${selectedFixture ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-                disabled={!selectedFixture}
-                onClick={() => console.log('Subastar', selectedFixture)}
+                className={`px-4 py-2 rounded ${selectedRequest ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                disabled={!selectedRequest}
+                onClick={() => console.log('Subastar', selectedRequest)}
               >
                 Subastar
               </button>
             </Link>
-            <Link to={`/create-exchange/${selectedFixture}`}>
+            <Link to={`/create-exchange/${selectedRequest}`}>
               <button
-                className={`ml-4 px-4 py-2 rounded ${selectedFixture ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-                disabled={!selectedFixture}
-                onClick={() => console.log('Intercambiar', selectedFixture)}
+                className={`ml-4 px-4 py-2 rounded ${selectedRequest ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                disabled={!selectedRequest}
+                onClick={() => createExchange(selectedRequest)}
               >
                 Intercambiar
               </button>

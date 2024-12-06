@@ -16,13 +16,15 @@ const Bid = (request, fixture) => {
 
   const fetchBids = async () => {
     try {
-      // const token = await getAccessTokenSilently();
-      // const decodedToken = jwt_decode(token);
-      // console.log('Decoded token', decodedToken);
       console.log('Fetching requests', user.email);
-      // const tokenParts = user.sub.split('|');
-      // const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
-      const response = await axios.get(`${API_URL}/bids`);
+      const tokenParts = user.sub.split('|');
+      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const response = await axios.get(`${API_URL}/bids`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
       console.log(response);
       setBids(response.data);
     } catch (error) {

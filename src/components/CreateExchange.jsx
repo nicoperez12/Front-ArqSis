@@ -16,13 +16,18 @@ const CreateExchange = (request, fixture) => {
 
   const fetchExchanges = async () => {
     try {
-      // const token = await getAccessTokenSilently();
-      // const decodedToken = jwt_decode(token);
+      const tokenParts = user.sub.split('|');
+      const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
       // console.log('Decoded token', decodedToken);
       console.log('Fetching requests', user.email);
       // const tokenParts = user.sub.split('|');
       // const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
-      const response = await axios.get(`${API_URL}/exchanges`);
+      const response = await axios.get(`${API_URL}/exchanges/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
       console.log(response);
       setExchanges(response.data);
     } catch (error) {
