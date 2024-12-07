@@ -29,13 +29,8 @@ const Admin = () => {
       console.log('Fetching admin', user.email);
       const tokenParts = user.sub.split('|');
       const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
-      const response = await axios.get(`${API_URL}/users`, {
-          params: {
-            user_token: token,
-          }
-        }
-      );
-      console.log(response);
+      const response = await axios.get(`${API_URL}/users/${token}`);
+      console.log("ADMIN", response);
       setAdmin(response.data.admin);
     } catch (error) {
       console.error('Error fetching admin:', error);
@@ -96,16 +91,31 @@ const Admin = () => {
     }
   }
 
+  const getRequestById = (id) => {
+    return requests.find((request) => request.id === id);
+  }
+
   const createAuction = async (requestId) => {
     try {
       console.log('Creating auction', requestId);
       const tokenParts = user.sub.split('|');
       const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const request = requests.find((request) => request.id === requestId)
       const response = await axios.post(`${API_URL}/auctions`, {
-          request_id: requestId,
-          user_token: token,
-        }
-      );
+        auctionId: requestId,
+        proposalId: null,
+        fixtureId: request.fixture_id,
+        leagueName: request.league_name,
+        round: request.round,
+        result: request.result,
+        quantity: request.quantity,
+        groupId: request.group_id,
+        type: "offer",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
       console.log(response);
       fetchAuctions();
     } catch (error) {
@@ -118,9 +128,17 @@ const Admin = () => {
       console.log('Creating exchange', requestId);
       const tokenParts = user.sub.split('|');
       const token = tokenParts.length > 1 ? tokenParts[1] : user.sub;
+      const request = requests.find((request) => request.id === requestId)
       const response = await axios.post(`${API_URL}/proposals`, {
-          request_id: requestId,
-          user_token: token,
+          auctionId: requestId,
+          proposalId: null,
+          fixtureId: request.fixture_id,
+          leagueName: request.league_name,
+          round: request.round,
+          result: request.result,
+          quantity: request.quantity,
+          groupId: request.group_id,
+          type: "offer",
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -136,7 +154,7 @@ const Admin = () => {
   return (
     <>
       <Navbar />
-      {isAuthenticated ? (
+      {isAuthenticated && admin ? (
         <>
           <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Subastar o Intercambiar</h1>
@@ -155,24 +173,16 @@ const Admin = () => {
             </div>
           </div>
           <div className="container mx-auto p-4">
-            <Link to={`/create-auction/${selectedRequest}`}>
-              <button
-                className={`px-4 py-2 rounded ${selectedRequest ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-                disabled={!selectedRequest}
-                onClick={() => console.log('Subastar', selectedRequest)}
-              >
-                Subastar
-              </button>
-            </Link>
-            <Link to={`/create-exchange/${selectedRequest}`}>
-              <button
-                className={`ml-4 px-4 py-2 rounded ${selectedRequest ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-                disabled={!selectedRequest}
-                onClick={() => createExchange(selectedRequest)}
-              >
-                Intercambiar
-              </button>
-            </Link>
+            <button
+              className={`px-4 py-2 rounded ${selectedRequest ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+              disabled={!selectedRequest}
+              onClick={() => createAuction(selectedRequest)}
+            >
+              Subastar
+            </button>
+
+            
+
           </div>
           <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Subastas</h1>
@@ -200,7 +210,17 @@ const Admin = () => {
                 </div>
               ))}
             </div>
+
+            <button
+              className={`ml-4 px-4 py-2 rounded ${selectedRequest ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+              disabled={!selectedRequest}
+              onClick={() => createExchange(selectedRequest)}
+            >
+              Intercambiar
+            </button>
           </div>
+
+          
   
         </>
       ) : (
